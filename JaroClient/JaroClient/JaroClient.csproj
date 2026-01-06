@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <AssemblyName>Launcher</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Visuals\BG_Clear.png" />
+    <None Remove="Visuals\BG_Home.png" />
+    <None Remove="Visuals\BG_Main.png" />
+    <None Remove="Visuals\BG_Main_Logo.png" />
+    <None Remove="Visuals\BG_StartScreen.png" />
+    <None Remove="Visuals\Fonts\CINZEL-BOLD.OTF" />
+    <None Remove="Visuals\Fonts\DUBAI-BOLD.TTF" />
+    <None Remove="Visuals\Fonts\TOBAGOPOSTER.TTF" />
+    <None Remove="Visuals\Jaro_MainLogo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MahApps.Metro" Version="2.4.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Visuals\BG_Clear.png" />
+    <Resource Include="Visuals\BG_Home.png" />
+    <Resource Include="Visuals\BG_Main.png" />
+    <Resource Include="Visuals\BG_Main_Logo.png" />
+    <Resource Include="Visuals\Fonts\CINZEL-BOLD.OTF" />
+    <Resource Include="Visuals\Fonts\DUBAI-BOLD.TTF" />
+    <Resource Include="Visuals\Jaro_MainLogo.png" />
+  </ItemGroup>
+
+</Project>

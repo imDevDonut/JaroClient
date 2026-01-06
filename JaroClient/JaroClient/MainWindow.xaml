@@ -1,0 +1,44 @@
+﻿<mah:MetroWindow
+    xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:JaroClient"
+        mc:Ignorable="d"
+    x:Class="JaroClient.MainWindow"
+    WindowStartupLocation="CenterScreen"
+    Loaded="Window_Loaded"
+    ResizeMode="NoResize"
+    WindowStyle="None"
+    BorderThickness="0"
+    ShowTitleBar="False"
+        Title="Jaro Cliente"
+    Width="640" Height="420"
+    AllowsTransparency="True"
+    Background="Transparent"
+    
+    ShowCloseButton="False">
+
+    <Border x:Name="Background" Grid.RowSpan="1" Grid.ColumnSpan="1" CornerRadius="8,8,8,8"
+            BorderBrush="#FF2A2A2A"
+            BorderThickness="1">
+        <Border.Background>
+            <ImageBrush ImageSource="/Visuals/BG_Main_Logo.png" Stretch="UniformToFill"/>
+        </Border.Background>
+        <Grid>
+            <TextBlock x:Name="ClientVersion" Height="24" TextWrapping="Wrap" Text="Client v0.1" Width="140" TextAlignment="Center" Foreground="#FF2D2C2A" FontWeight="Bold" FontFamily="Dubai" FontSize="14" Margin="22,135,476,259"/>
+            
+            <StackPanel Width="240" Height="36"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom" Margin="0,0,0,32">
+
+                <mah:MetroProgressBar x:Name="StartingScreen_ProgressBar" Height="6" Width="128" Background="#002D2C2A" Foreground="#FF2D2C2A" Value="51" Visibility="Collapsed"/>
+
+                <TextBlock x:Name="StartingScreen_StatusText" HorizontalAlignment="Center" Height="24" TextWrapping="Wrap" Text="Verificando" VerticalAlignment="Bottom" Width="140" TextAlignment="Center" Foreground="#FF2D2C2A" FontWeight="Bold" FontFamily="Dubai" FontSize="14" Margin="0,0,0,32"/>
+                
+
+            </StackPanel>
+        </Grid>
+    </Border>
+</mah:MetroWindow>
