@@ -25,3 +25,5 @@ F:\Repos\Jaro-Client\JaroClient\JaroClient\obj\Debug\net8.0-windows\Launcher.dll
 F:\Repos\Jaro-Client\JaroClient\JaroClient\obj\Debug\net8.0-windows\refint\Launcher.dll
 F:\Repos\Jaro-Client\JaroClient\JaroClient\obj\Debug\net8.0-windows\Launcher.pdb
 F:\Repos\Jaro-Client\JaroClient\JaroClient\obj\Debug\net8.0-windows\ref\Launcher.dll
+F:\Repos\Jaro-Client\JaroClient\JaroClient\obj\Debug\net8.0-windows\App.baml
+F:\Repos\Jaro-Client\JaroClient\JaroClient\obj\Debug\net8.0-windows\Launcher_Content.g.cs

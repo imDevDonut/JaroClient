@@ -4,34 +4,130 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Windows;
+using System.Windows.Controls;
 using MahApps.Metro.Controls;
 
-struct GameInfo
+class GameInfo
 {
-    public string Name;
-    public string VersionLink;
-    public string ZipLink;
-    public string RootPath;
-    public string VersionFile;
-    public string GameZip;
-    public string GameExe;
+    public MetroProgressBar ProgressBar;
+    public TextBlock StatusText;
+    public Button GameButton;
+
+    public string GameKeyNet = "";
+    public string GameNet = "";
+
+    public string GameZipPath = "";
+    public string GameFolder = "";
+
+    public string LocalKey = "";
+    public string OnlineKey = "";
+
+    public string GameExe = "";
+
+    public GamesList GameInList;
+
+    GameStatus _gameStatus;
+    internal GameStatus GameStatus
+    {
+        get => _gameStatus;
+
+        set
+        {
+            _gameStatus = value;
+
+            switch (_gameStatus)
+            {
+                case GameStatus.Empty:
+                    StatusText.Text = "Instalar";
+                    ProgressBar.Visibility = Visibility.Collapsed;
+                    GameButton.IsEnabled = true;
+                    break;
+
+                case GameStatus.Outdated:
+                    StatusText.Text = "Actualizar";
+                    ProgressBar.Visibility = Visibility.Collapsed;
+                    GameButton.IsEnabled = true;
+                    break;
+
+                case GameStatus.Updating:
+                    StatusText.Text = "Actualizando...";
+                    ProgressBar.Visibility = Visibility.Visible;
+                    GameButton.IsEnabled = false;
+                    break;
+
+                case GameStatus.Ready:
+                    StatusText.Text = "Jugar";
+                    ProgressBar.Visibility = Visibility.Collapsed;
+                    GameButton.IsEnabled = true;
+                    break;
+
+                case GameStatus.Broken:
+                    StatusText.Text = "Reparar";
+                    ProgressBar.Visibility = Visibility.Collapsed;
+                    GameButton.IsEnabled = true;
+                    break;
+            }
+        }
+    }
+
+    public void Verify()
+    {
+        if (!File.Exists(LocalKey))
+        {
+            GameStatus = GameStatus.Empty;
+            return;
+        }
+
+        if (!File.Exists(GameExe))
+        {
+            GameStatus = GameStatus.Broken;
+            return;
+        }
+
+        string localKey = File.ReadAllText(LocalKey);
+
+        try
+        {
+            WebClient webClient = new();
+            string onlineKey = webClient.DownloadString(GameKeyNet);
+
+            if (onlineKey != localKey)
+                GameStatus = GameStatus.Outdated;
+            else
+                GameStatus = GameStatus.Ready;
+        }
+        catch (Exception ex)
+        {
+            GameStatus = GameStatus.Broken;
+            MessageBox.Show($"{GameInList} necesita reparación.");
+        }
+    }
 }
 
 enum GameStatus
 {
     Empty,
+    Outdated,
     Updating,
     Ready,
     Broken,
+}
+
+enum GamesList
+{
+    JaroTCG,
 }
 
 namespace JaroClient
 {
     public partial class MainWindow : MetroWindow
     {
-        bool _hasRun = false;
+        // Add Icon to this
+        bool hasVerifiedClient = false;
 
         string _rootParentPath;
+        string _gamesFolder;
+
         string _clientPath;
         string _clientExe;
 
@@ -44,6 +140,10 @@ namespace JaroClient
         string _updaterFolder;
         string _updaterExe;
 
+        // GAME INFO
+        bool _forceClose = false;
+        List<GameInfo> _allGamesInfo = new List<GameInfo>();
+        GameInfo _gameInfo_JaroTCG;
 
         GameStatus _clientStatus;
         internal GameStatus ClientStatus
@@ -65,7 +165,6 @@ namespace JaroClient
                         break;
 
                     case GameStatus.Ready:
-                        
                         // Go to Main Screen Here
                         break;
 
@@ -94,15 +193,17 @@ namespace JaroClient
 
         void Window_Loaded(object sender, EventArgs e)
         {
-            if (_hasRun) return;
-            _hasRun = true;
-            CheckForClientUpdates();
+            if (hasVerifiedClient) return;
+            hasVerifiedClient = true;
+
+            GamesHolder.Visibility = Visibility.Collapsed;
 
             if (Directory.Exists(_updaterFolder))
             {
                 Directory.Delete(_updaterFolder, true);
-                MessageBox.Show("El cliente se ha actualizado correctamente.");
             }
+
+            CheckForClientUpdates();
         }
 
         void CheckForClientUpdates()
@@ -110,35 +211,41 @@ namespace JaroClient
             if (ClientStatus != GameStatus.Broken && File.Exists(_clientKeyLocal))
             {
                 string localKey = File.ReadAllText(_clientKeyLocal);
-
                 try
                 {
-                    WebClient webClient = new();
-                    string onlineKey = webClient.DownloadString(_clientKeyNet);
+                    using WebClient webClient = new();
+                    string onlineKey = webClient.DownloadString(_clientKeyNet).Trim();
 
                     if (onlineKey != localKey)
                     {
-                        ClientStatus = GameStatus.Updating;
-                        RequestUpdate(onlineKey);
+                        RequestClientUpdate();
                     }
                     else
                     {
                         ClientStatus = GameStatus.Ready;
+                        InitializeGames();
+                        GamesHolder.Visibility = Visibility.Visible;
                     }
+                }
+                catch (WebException ex) when
+                    ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound)
+                {
+                    RequestClientUpdate();
                 }
                 catch (Exception ex)
                 {
+                    // ❌ Real error
                     MessageBox.Show($"Ha ocurrido un problema\n\n{ex}");
                     ClientStatus = GameStatus.Broken;
                 }
             }
             else
             {
-                RequestUpdate();
+                RequestClientUpdate();
             }
         }
 
-        void RequestUpdate(string onlineKey = null)
+        void RequestClientUpdate()
         {
             try
             {
@@ -147,20 +254,50 @@ namespace JaroClient
 
                 ClientStatus = GameStatus.Updating;
 
-                if (string.IsNullOrEmpty(onlineKey))
-                    onlineKey = webClient.DownloadString(_clientKeyNet);
-
                 StartingScreen_ProgressBar.Minimum = 0;
                 StartingScreen_ProgressBar.Minimum = 100;
                 StartingScreen_ProgressBar.Value = 0;
 
                 webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(OnClientUpdateDownload);
-                webClient.DownloadFileAsync(new Uri(_updaterNet), _updaterZip, onlineKey);
+                webClient.DownloadFileAsync(new Uri(_updaterNet), _updaterZip);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error al actualizar cliente.\n\n{ex}");
                 ClientStatus = GameStatus.Broken;
+            }
+        }
+
+        void InitializeGames()
+        {
+            _gamesFolder = Path.Combine(_rootParentPath, "Games");
+            Directory.CreateDirectory(_gamesFolder);
+
+            // Jaro TCG
+
+            _gameInfo_JaroTCG = new GameInfo
+            {
+                ProgressBar = ProgressBar_JaroTCG,
+                StatusText = StatusText_JaroTCG,
+                GameButton = GameButton_JaroTCG,
+                GameKeyNet = "https://raw.githubusercontent.com/imDevDonut/JaroClient/refs/heads/main/key_JaroTCG",
+                GameNet = "https://github.com/imDevDonut/JaroClient/releases/download/Launcher/JaroTCG.zip",
+
+                GameFolder = Path.Combine(_gamesFolder, "Jaro TCG"),
+                GameZipPath = Path.Combine(_gamesFolder, "JaroTCG.zip"),
+
+                LocalKey = Path.Combine(_gamesFolder, "Jaro TCG", "GameKey.devour"),
+                GameExe = Path.Combine(_gamesFolder, "Jaro TCG", "Jaro TCG.exe"),
+
+                GameInList = GamesList.JaroTCG,
+                GameStatus = GameStatus.Empty
+            };
+
+            _allGamesInfo.Add(_gameInfo_JaroTCG);
+
+            foreach (var game in _allGamesInfo)
+            {
+                game.Verify();
             }
         }
 
@@ -183,6 +320,7 @@ namespace JaroClient
             ProcessStartInfo startInfo = new(_updaterExe);
             startInfo.WorkingDirectory = _updaterFolder;
             Process.Start(startInfo);
+            _forceClose = true;
             Close();
         }
 
@@ -194,9 +332,126 @@ namespace JaroClient
                 return;
         }
 
+        void Play_JaroTCG_Button_Click(object sender, RoutedEventArgs e)
+        {
+            UseGameButton(_gameInfo_JaroTCG);
+        }
+
+        void LaunchGame(GameInfo gameInfo)
+        {
+            gameInfo.Verify();
+
+            switch (gameInfo.GameStatus)
+            {
+                case GameStatus.Ready:
+                    ProcessStartInfo startInfo = new(gameInfo.GameExe);
+                    startInfo.WorkingDirectory = gameInfo.GameFolder;
+                    Process.Start(startInfo);
+                    Close();
+                    break;
+
+                case GameStatus.Broken:
+                    MessageBox.Show($"{gameInfo.GameInList} necesita repararse.");
+                    break;
+            }
+        }
+
+        void InstallGame(GameInfo gameInfo)
+        {
+            try
+            {
+                WebClient webClient = new();
+                webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
+                webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(OnGameDownloadCompleted);
+
+                gameInfo.GameStatus = GameStatus.Updating;
+                gameInfo.OnlineKey = webClient.DownloadString(gameInfo.GameKeyNet);
+
+                Directory.CreateDirectory(gameInfo.GameFolder);
+
+                StartingScreen_ProgressBar.Minimum = 0;
+                StartingScreen_ProgressBar.Maximum = 100;
+                StartingScreen_ProgressBar.Value = 0;
+
+                webClient.DownloadFileAsync(new Uri(gameInfo.GameNet), gameInfo.GameZipPath, gameInfo);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al actualizar cliente.\n\n{ex}");
+                ClientStatus = GameStatus.Broken;
+            }
+        }
+
         void WebClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            if (e.UserState is GameInfo game)
+            {
+                game.ProgressBar.Value = e.ProgressPercentage;
+                return;
+            }
+
             StartingScreen_ProgressBar.Value = e.ProgressPercentage;
+        }
+
+        void OnGameDownloadCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            if (e.UserState is not GameInfo game)
+                return;
+
+            try
+            {
+                string onlineKey = game.OnlineKey;
+                File.WriteAllText(game.LocalKey, onlineKey);
+
+                ZipFile.ExtractToDirectory(game.GameZipPath, _gamesFolder, true);
+                File.Delete(game.GameZipPath);
+
+                game.Verify();
+            }
+            catch (Exception ex)
+            {
+                game.GameStatus = GameStatus.Broken;
+                MessageBox.Show($"Error al instalar {game.GameInList}\n\n{ex}");
+            }
+        }
+
+        void UseGameButton(GameInfo gameInfo)
+        {
+            switch (gameInfo.GameStatus)
+            {
+                case GameStatus.Empty or GameStatus.Broken or GameStatus.Outdated:
+                    InstallGame(gameInfo);
+                    break;
+
+                case GameStatus.Ready:
+                    LaunchGame(gameInfo);
+                    break;
+            }
+        }
+
+        bool IsAnyGameUpdating()
+        {
+            foreach (var gameInfo in _allGamesInfo)
+            {
+                if (gameInfo.GameStatus == GameStatus.Updating)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            if (!_forceClose && IsAnyGameUpdating())
+            {
+                MessageBox.Show($"Jaro TCG se está actualizando.");
+                e.Cancel = true;
+                return;
+            }
+
+            base.OnClosing(e);
         }
     }
 }

@@ -81,7 +81,6 @@ namespace JaroLauncher
             _hasRun = true;
 
             RequestUpdate();
-
         }
 
         void RequestUpdate()

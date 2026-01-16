@@ -8,6 +8,7 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <AssemblyName>Launcher</AssemblyName>
+    <ApplicationIcon>Ico_JaroClient.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +21,11 @@
     <None Remove="Visuals\Fonts\DUBAI-BOLD.TTF" />
     <None Remove="Visuals\Fonts\TOBAGOPOSTER.TTF" />
     <None Remove="Visuals\Jaro_MainLogo.png" />
+    <None Remove="Visuals\Logos\Logo - JaroTCG.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Ico_JaroClient.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,13 +33,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Visuals\BG_Clear.png" />
-    <Resource Include="Visuals\BG_Home.png" />
-    <Resource Include="Visuals\BG_Main.png" />
-    <Resource Include="Visuals\BG_Main_Logo.png" />
+    <Resource Include="Visuals\Backgrounds\BG_Clear.png" />
+    <Resource Include="Visuals\Backgrounds\BG_Home.png" />
+    <Resource Include="Visuals\Backgrounds\BG_Main.png" />
+    <Resource Include="Visuals\Backgrounds\BG_Main_Logo.png" />
     <Resource Include="Visuals\Fonts\CINZEL-BOLD.OTF" />
     <Resource Include="Visuals\Fonts\DUBAI-BOLD.TTF" />
     <Resource Include="Visuals\Jaro_MainLogo.png" />
+    <Resource Include="Visuals\Logos\Logo - JaroTCG.png" />
   </ItemGroup>
 
 </Project>
