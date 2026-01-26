@@ -23,7 +23,7 @@ namespace JaroLauncher
         string _rootParentPath;
         string _updaterFolder;
 
-        string _clientKeyNet = "https://raw.githubusercontent.com/imDevDonut/JaroClient/refs/heads/main/ClientKey.Devour";
+        string _clientKeyNet = "https://raw.githubusercontent.com/imDevDonut/JaroClient/refs/heads/main/Keys/key_Client.devour";
         string _clientKeyLocal;
 
         string _clientNet = "https://github.com/imDevDonut/JaroClient/releases/download/Launcher/Launcher.zip";

@@ -84,12 +84,12 @@ class GameInfo
             return;
         }
 
-        string localKey = File.ReadAllText(LocalKey);
+        string localKey = File.ReadAllText(LocalKey).Trim();
 
         try
         {
             WebClient webClient = new();
-            string onlineKey = webClient.DownloadString(GameKeyNet);
+            string onlineKey = webClient.DownloadString(GameKeyNet).Trim();
 
             if (onlineKey != localKey)
                 GameStatus = GameStatus.Outdated;
@@ -131,7 +131,7 @@ namespace JaroClient
         string _clientPath;
         string _clientExe;
 
-        string _clientKeyNet = "https://raw.githubusercontent.com/imDevDonut/JaroClient/refs/heads/main/ClientKey.Devour";
+        string _clientKeyNet = "https://raw.githubusercontent.com/imDevDonut/JaroClient/refs/heads/main/Keys/key_Client.devour";
         string _clientKeyLocal;
 
         string _updaterNet = "https://github.com/imDevDonut/JaroClient/releases/download/Launcher/ClientUpdater.zip";
@@ -194,23 +194,28 @@ namespace JaroClient
         void Window_Loaded(object sender, EventArgs e)
         {
             if (hasVerifiedClient) return;
-            hasVerifiedClient = true;
 
-            GamesHolder.Visibility = Visibility.Collapsed;
-
-            if (Directory.Exists(_updaterFolder))
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                Directory.Delete(_updaterFolder, true);
-            }
+                hasVerifiedClient = true;
 
-            CheckForClientUpdates();
+                GamesHolder.Visibility = Visibility.Collapsed;
+
+                if (Directory.Exists(_updaterFolder))
+                {
+                    Directory.Delete(_updaterFolder, true);
+                }
+
+                CheckForClientUpdates();
+            }), System.Windows.Threading.DispatcherPriority.Background);
         }
 
         void CheckForClientUpdates()
         {
             if (ClientStatus != GameStatus.Broken && File.Exists(_clientKeyLocal))
             {
-                string localKey = File.ReadAllText(_clientKeyLocal);
+                string localKey = File.ReadAllText(_clientKeyLocal).Trim();
+
                 try
                 {
                     using WebClient webClient = new();
@@ -234,7 +239,6 @@ namespace JaroClient
                 }
                 catch (Exception ex)
                 {
-                    // ❌ Real error
                     MessageBox.Show($"Ha ocurrido un problema\n\n{ex}");
                     ClientStatus = GameStatus.Broken;
                 }
@@ -247,6 +251,8 @@ namespace JaroClient
 
         void RequestClientUpdate()
         {
+            MessageBox.Show($"El cliente se actualizará.");
+
             try
             {
                 WebClient webClient = new();
@@ -274,13 +280,12 @@ namespace JaroClient
             Directory.CreateDirectory(_gamesFolder);
 
             // Jaro TCG
-
             _gameInfo_JaroTCG = new GameInfo
             {
                 ProgressBar = ProgressBar_JaroTCG,
                 StatusText = StatusText_JaroTCG,
                 GameButton = GameButton_JaroTCG,
-                GameKeyNet = "https://raw.githubusercontent.com/imDevDonut/JaroClient/refs/heads/main/key_JaroTCG",
+                GameKeyNet = "https://raw.githubusercontent.com/imDevDonut/JaroClient/refs/heads/main/Keys/key_JaroTCG.devour",
                 GameNet = "https://github.com/imDevDonut/JaroClient/releases/download/Launcher/JaroTCG.zip",
 
                 GameFolder = Path.Combine(_gamesFolder, "Jaro TCG"),

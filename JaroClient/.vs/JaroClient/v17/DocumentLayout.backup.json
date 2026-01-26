@@ -68,7 +68,8 @@
               "ToolTip": "F:\\Repos\\Jaro-Client\\JaroClient\\JaroClient\\App.xaml",
               "RelativeToolTip": "JaroClient\\App.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-01-07T12:39:23.83Z"
+              "WhenOpened": "2026-01-07T12:39:23.83Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -90,7 +91,7 @@
               "RelativeDocumentMoniker": "JaroClient\\MainWindow.xaml.cs",
               "ToolTip": "F:\\Repos\\Jaro-Client\\JaroClient\\JaroClient\\MainWindow.xaml.cs",
               "RelativeToolTip": "JaroClient\\MainWindow.xaml.cs",
-              "ViewState": "AgIAAMQAAAAAAAAAAAAuwOQAAAARAAAAAAAAAA==",
+              "ViewState": "AgIAAI8AAAAAAAAAAAAAAIMBAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-05T23:49:53.723Z",
               "EditorCaption": ""
@@ -104,7 +105,8 @@
               "ToolTip": "F:\\Repos\\Jaro-Client\\JaroClient\\JaroClient\\MainWindow.xaml",
               "RelativeToolTip": "JaroClient\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-01-05T23:49:50.561Z"
+              "WhenOpened": "2026-01-05T23:49:50.561Z",
+              "EditorCaption": ""
             }
           ]
         }
